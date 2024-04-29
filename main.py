@@ -33,7 +33,7 @@ def compute_similarities(dataset1, dataset2):
     similarities = cosine_similarity(dataset1['rating_vector'], dataset2['rating_vector'])
     return similarities
 
-def perform_record_linkage(similarities, m_prob, u_prob):
+def perform_record_linkage(similarities, m_prob, u_prob, threshold):
     """
     Perform record linkage using the Fellegi-Sunter model with the given probabilities.
     """
@@ -41,9 +41,6 @@ def perform_record_linkage(similarities, m_prob, u_prob):
     indexer.full()
     
     pair_scores = indexer.score_pairs(similarities, m_prob, u_prob)
-    
-    # Set appropriate threshold based on domain knowledge or tuning
-    threshold = ...
     
     clusters = pair_scores[pair_scores > threshold].to_clusters()
     
