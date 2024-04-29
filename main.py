@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from recordlinkage import rl_lingpipe, rl_score, rl_cluster
+import recordlinkage
 
 def preprocess_data(dataset, min_ratings=10):
     """
@@ -33,11 +33,18 @@ def compute_similarities(dataset1, dataset2):
     similarities = cosine_similarity(dataset1['rating_vector'], dataset2['rating_vector'])
     return similarities
 
-def perform_record_linkage(similarities, m_prob, u_prob, threshold):
+def perform_record_linkage(similarities, m_prob, u_prob):
     """
-    Perform record linkage using the Fellegi-Sunter model with the given probabilities and threshold.
+    Perform record linkage using the Fellegi-Sunter model with the given probabilities.
     """
-    weight_vec = rl_lingpipe(similarities, m_prob, u_prob)
-    decisions = rl_score(weight_vec, threshold)
-    clusters = rl_cluster(decisions)
+    indexer = recordlinkage.Index()
+    indexer.full()
+    
+    pair_scores = indexer.score_pairs(similarities, m_prob, u_prob)
+    
+    # Set appropriate threshold based on domain knowledge or tuning
+    threshold = ...
+    
+    clusters = pair_scores[pair_scores > threshold].to_clusters()
+    
     return clusters
